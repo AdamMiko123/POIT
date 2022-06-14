@@ -14,13 +14,13 @@
 
       socket.on('my_response', function(msg) {
         console.log(msg.data);
-        $('#log').append('Received #'+msg.count+': \'{"t": '+msg.time+', "x": '+msg.count+', "y": '+msg.data+' }\'<br>').html(); });
+        $('#log').append('Received #'+msg.count+': \'{"distance": '+msg.distance+', "humidity": '+msg.humidity+', "temperature": '+msg.temperature+', "photo": '+msg.photo+'}\'<br>').html(); });
 
       $('form#emit').submit(function(event) {
           socket.emit('my_event', {value: $('#emit_value').val()});
           return false; });
       $('#buttonVal1').click(function(event) {
-          console.log($('#buttonVal').val());
+          console.log($('#buttonVal1').val());
           socket.emit('click_event', {value: $('#buttonVal1').val()});
           return false; });
       $('#buttonVal2').click(function(event) {

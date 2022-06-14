@@ -1,62 +1,52 @@
 from threading import Lock
 from flask import Flask, render_template, session, request, jsonify, url_for
 from flask_socketio import SocketIO, emit, disconnect    
-import time
-import random
+import serial
+
+ser = serial.Serial("/dev/ttyS2")
+ser.baudrate = 9600
 
 async_mode = None
-
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app, async_mode=async_mode)
 thread = None
 thread_lock = Lock() 
-
-
+    
 def background_thread(args):
-    count = 0    
-    dataList = []          
+    count = 0
     while True:
+        read_ser = ser.readline()
+        read_ser = read_ser.decode()
         if args:
-          A = dict(args).get('A')
-          btnV = dict(args).get('btn_value')
+            vyber = dict(args).get('Vyber')
+            btnV = dict(args).get('btn_value')
         else:
-          A = 1
-          btnV = 'null'
+            vyber = 1
+            btnV = 'null'
         print (args) 
-        socketio.sleep(2)
+        socketio.sleep(1)
         count += 1
-        prem = random.random()
-        dataDict = {
-          "t": time.time(),
-          "x": count,
-          "y": float(A)*prem}
-        dataList.append(dataDict)
-        if len(dataList)>0:
-          print (str(dataList))
-          print (str(dataList).replace("'", "\""))
+        read_ser_data = read_ser.split(" ")
+        print(read_ser_data)
         if btnV == "start":
-          socketio.emit('my_response',
-                      {'time': time.time(), 'data': float(A)*prem, 'count': count},
-                      namespace='/test')  
+            socketio.emit('my_response',{'distance': float(read_ser_data[0]), 'humidity': float(read_ser_data[1]),
+                                         'temperature': float(read_ser_data[2]), 'photo': float(read_ser_data[3]), 'count': count},
+                          namespace='/test')  
 
-@app.route('/')
-def index():
+@app.route('/', methods=['GET', 'POST'])
+def skuska():
     return render_template('skuska.html', async_mode=socketio.async_mode)
   
 @socketio.on('my_event', namespace='/test')
 def test_message(message):   
-    session['receive_count'] = session.get('receive_count', 0) + 1 
-    session['A'] = message['value']    
-    emit('my_response',
-         {'data': message['value'], 'count': session['receive_count']})
+    session['Vyber'] = message['value']  
+    #emit('my_response', {'Distance': session['Distance'], 'Humidity': session['Humidity'], 'Temperature': session['Temperature'], 'Photo': session['Photo']})
  
 @socketio.on('disconnect_request', namespace='/test')
 def disconnect_request():
-    session['receive_count'] = session.get('receive_count', 0) + 1
-    emit('my_response',
-         {'data': 'Disconnected!', 'count': session['receive_count']})
+    emit('my_response', {'data': 'Disconnected!'})
     disconnect()
 
 @socketio.on('connect', namespace='/test')
