@@ -14,7 +14,7 @@
 
       socket.on('my_response', function(msg) {
         console.log(msg.data);
-        $('#log').append('Received #'+msg.count+': \'{"distance": '+msg.distance+', "humidity": '+msg.humidity+', "temperature": '+msg.temperature+', "photo": '+msg.photo+'}\'<br>').html(); });
+        $('#log').append('Data #'+msg.count+': \'{"Distance": '+msg.distance+' cm, "Humidity": '+msg.humidity+' %, "Temperature": '+msg.temperature+' °C, "Photo": '+msg.photo+'}\'<br>').html(); });
 
       $('form#emit').submit(function(event) {
           socket.emit('my_event', {value: $('#emit_value').val()});
@@ -27,8 +27,8 @@
           console.log($('#buttonVal2').val());
           socket.emit('click_event', {value: $('#buttonVal2').val()});
           return false; });
-      $('form#disconnect').submit(function(event) {
-          socket.emit('disconnect_request');
+      $('form#close').submit(function(event) {
+          socket.emit('close');
           return false; });         
       });
     </script>
@@ -40,10 +40,10 @@
     <input type="text" name="emit_value" id="emit_value" placeholder="Amplituda">
     <input type="submit" value="Send">
   </form>
-  <button id="buttonVal1" type="submit" value="start">Start</button>
-  <button id="buttonVal2" type="submit" value="stop">Stop</button>
-  <form id="disconnect" method="POST" action="#">
-    <input type="submit" value="Disconnect">
+  <button id="buttonVal1" type="submit" value="Start">Start</button>
+  <button id="buttonVal2" type="submit" value="Stop">Stop</button>
+  <form id="close" method="POST" action="#">
+    <input type="submit" value="Close">
   </form> 
   <h2>Receive:</h2>
   <div id="log"></div>
