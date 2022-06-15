@@ -3,17 +3,17 @@ from flask import Flask, render_template, session, request, jsonify, url_for
 from flask_socketio import SocketIO, emit, disconnect    
 import serial
 
-ser = serial.Serial("/dev/ttyS2")
-ser.baudrate = 9600
-
 async_mode = None
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app, async_mode=async_mode)
 thread = None
-thread_lock = Lock() 
-    
+thread_lock = Lock()
+
+ser=serial.Serial("/dev/ttyS2")
+ser.baudrate = 9600
+  
 def background_thread(args):
     count = 0
     while True:
@@ -29,6 +29,9 @@ def background_thread(args):
         read_ser_data = read_ser.split(" ")
         read_ser_data[3] = read_ser_data[3].replace("\r\n","")
         print(read_ser_data)
+        with open("file.txt","a") as file:
+            file.write("Distance: "+read_ser_data[0]+" Humidity: "+read_ser_data[1]+" Temperature: "+read_ser_data[2]+" Photo: "+read_ser_data[3]+"\n")
+            
         if btnVstart == "Start":
             if btnVchoose == "Distance":
                 socketio.emit('my_response',{'velicina': "Distance", 'data_choose': float(read_ser_data[0]), 'count': count, 'unit': " cm"}, namespace='/test')
@@ -51,10 +54,11 @@ def start_event(message):
 def choose_event(message):   
     session['btn_choose'] = message['value']
     
-@socketio.on('close', namespace='/test')
-def close():
+@socketio.on('closed', namespace='/test')
+def closed():
     emit('my_response', {'data': 'Closed'})
     disconnect()
+    ser.cancel_read()
 
 @socketio.on('connect', namespace='/test')
 def connect():

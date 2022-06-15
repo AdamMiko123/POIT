@@ -1,0 +1,5 @@
+Distance: 2137 Humidity: 34.00 Temperature: 28.00 Photo: 1
+Distance: 2137 Humidity: 33.00 Temperature: 28.00 Photo: 1
+Distance: 2137 Humidity: 33.00 Temperature: 28.00 Photo: 1
+Distance: 2136 Humidity: 33.00 Temperature: 28.00 Photo: 1
+Distance: 2136 Humidity: 33.00 Temperature: 28.00 Photo: 1

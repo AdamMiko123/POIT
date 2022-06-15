@@ -15,9 +15,6 @@
       namespace = '/test';
       var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
 
-      //socket.on('connect', function() {
-        //socket.emit('my_event', {data: 'I\'m connected!', value: 1}); });
-
       socket.on('my_response', function(msg) {
         console.log(msg.data);
         $('#log').append('Data #'+msg.count+': \'{"'+msg.velicina+'": '+msg.data_choose+msg.unit+'}\'<br>').html(); });
@@ -216,9 +213,9 @@
       $('#startVal2').click(function(event) {
           console.log($('#startVal2').val());
           socket.emit('start_event', {value: $('#startVal2').val()});
-          return false; });
-      $('form#close').submit(function(event) {
-          socket.emit('close');
+          return false; }); 
+      $('form#closed').submit(function(event) {
+          socket.emit('closed');
           return false; });   
       $( function() {
         $("#tabs").tabs({
@@ -264,7 +261,7 @@
     </div>
         <hr>
     <h3>Close and disconnect</h3>
-    <form id="close" method="POST" action="#">
+    <form id="closed" method="POST" action="#">
       <input type="submit" value="Close">
     </form> 
  </body>
