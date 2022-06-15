@@ -2,9 +2,15 @@
 <html>
  <head>
   <title>POIT skuska</title>
+   <link rel="stylesheet" href="static/jquery-ui.min.css">
    <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.5/socket.io.min.js"></script>
-   <script type="text/javascript" charset="utf-8">
+   <script type="text/javascript" charset="utf-8"></script>
+   <script src="static/plotly-latest.min.js"></script>
+   <script src="static/gauge.min.js"></script>
+   <script src="static/jquery-3.2.1.min.js"></script>
+   <script src="static/jquery-ui.min.js"></script>
+   <script>
      $(document).ready(function() {
       namespace = '/test';
       var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
@@ -16,9 +22,32 @@
         console.log(msg.data);
         $('#log').append('Data #'+msg.count+': \'{"'+msg.velicina+'": '+msg.data_choose+msg.unit+'}\'<br>').html(); });
         
-      $('form#emit').submit(function(event) {
-          socket.emit('my_event', {value: $('#emit_value').val()});
-          return false; });
+      var x = new Array();
+      var y = new Array();
+      var trace;
+      var layout;
+      socket.on('my_response', function(msg) {
+        x.push(parseFloat(msg.count));
+        y.push(parseFloat(msg.data_choose));
+        trace = {
+            x: x,
+            y: y,
+        };    
+        layout = {
+          title: 'Graph',
+          xaxis: {
+              title: 'Count',
+          },
+          yaxis: {
+              title: 'Value',
+          }
+        };
+        console.log(trace);
+        var traces = new Array();
+        traces.push(trace);
+        Plotly.newPlot($('#plotdiv')[0], traces, layout);             
+      }); 
+        
       $('#chooseVal1').click(function(event) {
           console.log($('#chooseVal1').val());
           socket.emit('choose_event', {value: $('#chooseVal1').val()});
@@ -45,27 +74,53 @@
           return false; });
       $('form#close').submit(function(event) {
           socket.emit('close');
-          return false; });         
+          return false; });   
+      $( function() {
+        $("#tabs").tabs({
+          event: "mouseover"
+        });
+      }); 
       });
     </script>
  </head>
  <body>
-  <h1>Intelligent home monitoring system</h1>
-  <h2>Control</h2>
-  <form id="emit" method="POST" action='#'>
-    <input type="text" name="emit_value" id="emit_value" placeholder="">
-    <input type="submit" value="Send">
-  </form>
-  <button id="chooseVal1" type="submit" value="Distance">Distance</button>
-  <button id="chooseVal2" type="submit" value="Humidity">Humidity</button>
-  <button id="chooseVal3" type="submit" value="Temperature">Temperature</button>
-  <button id="chooseVal4" type="submit" value="Photo">Photo</button>
-  <button id="startVal1" type="submit" value="Start">Start</button>
-  <button id="startVal2" type="submit" value="Stop">Stop</button>
-  <form id="close" method="POST" action="#">
-    <input type="submit" value="Close">
-  </form> 
-  <h2>Data</h2>
-  <div id="log"></div>
+    <h1>Intelligent home monitoring system</h1>
+    <h2>Control</h2>
+    <h3>Choose monitored physical value</h3>
+    <button id="chooseVal1" type="submit" value="Distance">Distance</button>
+    <button id="chooseVal2" type="submit" value="Humidity">Humidity</button>
+    <button id="chooseVal3" type="submit" value="Temperature">Temperature</button>
+    <button id="chooseVal4" type="submit" value="Photo">Photo</button>
+    <hr>
+    <h3>Start and Stop</h3>
+    <button id="startVal1" type="submit" value="Start">Start</button>
+    <button id="startVal2" type="submit" value="Stop">Stop</button>
+    <hr>
+    <h2>Monitored data</h2>
+    <div id="tabs">
+      <ul>
+        <li><a href="#list">Values</a></li>
+        <li><a href="#graph">Graph</a></li>
+        <li><a href="#gauge">Gauge</a></li>
+      </ul>
+      
+      <div id="list">
+        <div id="log"></div>
+      </div>
+      
+      <div id="graph">
+        <div id="plotdiv" style="width:600px;height:250px;"></div>
+      </div>
+      
+      <div id="gauge"> 
+        </form> 
+          <canvas id="canvasID"></canvas>
+      </div>
+    </div>
+        <hr>
+    <h3>Close and disconnect</h3>
+    <form id="close" method="POST" action="#">
+      <input type="submit" value="Close">
+    </form> 
  </body>
 </html>
