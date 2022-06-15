@@ -15,10 +15,12 @@
       namespace = '/test';
       var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
 
+      //vypis logu na stranku
       socket.on('my_response', function(msg) {
         console.log(msg.data);
         $('#log').append('Data #'+msg.count+': \'{"'+msg.velicina+'": '+msg.data_choose+msg.unit+'}\'<br>').html(); });
         
+      //vykreslenie grafu monitorovanych udajov
       var x = new Array();
       var y = new Array();
       var trace;
@@ -27,6 +29,7 @@
       socket.on('my_response', function(msg) {
         x.push(parseFloat(msg.count));
         y.push(parseFloat(msg.data_choose));
+        //osetrenie premazania poli x a y v pripade zmeny monitorovanej veliciny
         if (velicina_now != msg.velicina){
           x = [];
           y = [];
@@ -51,7 +54,9 @@
         Plotly.newPlot($('#plotdiv')[0], traces, layout);             
       }); 
 
+      //vykreslenie cifernika pre monitoring udajov
       socket.on('my_response', function(msg) {
+        //rozsahy a dizajn cifernika osetreny jednoduchym podmienenim
         if (msg.velicina == "Distance") {
           socket.on('my_response', function(msg) {
             var gauge = new RadialGauge({
@@ -189,34 +194,49 @@
           });
         }
       });
-        
+      
+      //metoda pre tlacidlo vyberu 1
       $('#chooseVal1').click(function(event) {
           console.log($('#chooseVal1').val());
           socket.emit('choose_event', {value: $('#chooseVal1').val()});
           return false; });
+          
+      //metoda pre tlacidlo vyberu 2
       $('#chooseVal2').click(function(event) {
           console.log($('#chooseVal2').val());
           socket.emit('choose_event', {value: $('#chooseVal2').val()});
           return false; });
+          
+      //metoda pre tlacidlo vyberu 3
       $('#chooseVal3').click(function(event) {
           console.log($('#chooseVal3').val());
           socket.emit('choose_event', {value: $('#chooseVal3').val()});
           return false; });
+          
+      //metoda pre tlacidlo vyberu 4
       $('#chooseVal4').click(function(event) {
           console.log($('#chooseVal4').val());
           socket.emit('choose_event', {value: $('#chooseVal4').val()});
           return false; });
+          
+      //metoda pre tlacidlo start
       $('#startVal1').click(function(event) {
           console.log($('#startVal1').val());
           socket.emit('start_event', {value: $('#startVal1').val()});
           return false; });
+        
+      //metoda pre tlacidlo stop
       $('#startVal2').click(function(event) {
           console.log($('#startVal2').val());
           socket.emit('start_event', {value: $('#startVal2').val()});
           return false; }); 
+
+      //metoda pre tlacidlo close
       $('form#closed').submit(function(event) {
           socket.emit('closed');
-          return false; });   
+          return false; });  
+
+      //metoda pre fungovanie tabov pomocou prechodu mysou
       $( function() {
         $("#tabs").tabs({
           event: "mouseover"

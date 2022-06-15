@@ -1,10 +1,12 @@
 #include <dht.h>
 
+// nastavenie pinov
 const int echoPin = A5;
 const int trigPin = A4;
 const int dhtPin = A3;
 const int photoPin = 8;
 
+// premenne
 long duration, photo, distance;
 dht DHT;
  
