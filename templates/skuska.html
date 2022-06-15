@@ -26,9 +26,15 @@
       var y = new Array();
       var trace;
       var layout;
+      velicina_now = "DISTANCE";
       socket.on('my_response', function(msg) {
         x.push(parseFloat(msg.count));
         y.push(parseFloat(msg.data_choose));
+        if (velicina_now != msg.velicina){
+          x = [];
+          y = [];
+          velicina_now = msg.velicina;
+        }
         trace = {
             x: x,
             y: y,
@@ -47,6 +53,145 @@
         traces.push(trace);
         Plotly.newPlot($('#plotdiv')[0], traces, layout);             
       }); 
+
+      socket.on('my_response', function(msg) {
+        if (msg.velicina == "Distance") {
+          socket.on('my_response', function(msg) {
+            var gauge = new RadialGauge({
+            renderTo: 'canvasID',
+            width: 300,
+            height: 300,
+            units: msg.unit,
+            minValue: 0,
+            maxValue: 300,
+            majorTicks: ["0","30.0","60.0","90.0","120.0","150.0","180.0","210.0","240.0","270.0","300.0"],
+            minorTicks: 5,
+            strokeTicks: true,
+            highlights: [
+                {
+                    "from": 150,
+                    "to": 300,
+                    "color": "rgba(200, 50, 50, .75)"
+                }
+            ],
+            colorPlate: "#fff",
+            borderShadowWidth: 0,
+            borders: false,
+            needleType: "arrow",
+            needleWidth: 2,
+            needleCircleSize: 7,
+            needleCircleOuter: true,
+            needleCircleInner: false,
+            animationDuration: 500,
+            animationRule: "linear"
+            });
+            gauge.draw();
+            gauge.value = msg.data_choose;
+          });
+        }
+        if (msg.velicina == "Humidity") {
+          socket.on('my_response', function(msg) {
+            var gauge = new RadialGauge({
+            renderTo: 'canvasID',
+            width: 300,
+            height: 300,
+            units: msg.unit,
+            minValue: 0,
+            maxValue: 100,
+            majorTicks: ["0","10.0","20.0","30.0","40.0","50.0","60.0","70.0","80.0","90.0","100.0"],
+            minorTicks: 5,
+            strokeTicks: true,
+            highlights: [
+                {
+                    "from": 50,
+                    "to": 100,
+                    "color": "rgba(200, 50, 50, .75)"
+                }
+            ],
+            colorPlate: "#fff",
+            borderShadowWidth: 0,
+            borders: false,
+            needleType: "arrow",
+            needleWidth: 2,
+            needleCircleSize: 7,
+            needleCircleOuter: true,
+            needleCircleInner: false,
+            animationDuration: 500,
+            animationRule: "linear"
+            });
+            gauge.draw();
+            gauge.value = msg.data_choose;
+          });
+        }
+        if (msg.velicina == "Temperature") {
+          socket.on('my_response', function(msg) {
+            var gauge = new RadialGauge({
+            renderTo: 'canvasID',
+            width: 300,
+            height: 300,
+            units: msg.unit,
+            minValue: 0,
+            maxValue: 50,
+            majorTicks: ["0","5.0","10.0","15.0","20.0","25.0","30.0","35.0","40.0","45.0","50.0"],
+            minorTicks: 5,
+            strokeTicks: true,
+            highlights: [
+                {
+                    "from": 25,
+                    "to": 50,
+                    "color": "rgba(200, 50, 50, .75)"
+                }
+            ],
+            colorPlate: "#fff",
+            borderShadowWidth: 0,
+            borders: false,
+            needleType: "arrow",
+            needleWidth: 2,
+            needleCircleSize: 7,
+            needleCircleOuter: true,
+            needleCircleInner: false,
+            animationDuration: 500,
+            animationRule: "linear"
+            });
+            gauge.draw();
+            gauge.value = msg.data_choose;
+          });
+        }
+        if (msg.velicina == "Photo") {
+          socket.on('my_response', function(msg) {
+            var gauge = new RadialGauge({
+            renderTo: 'canvasID',
+            width: 300,
+            height: 300,
+            units: msg.unit,
+            minValue: 0,
+            maxValue: 1,
+            majorTicks: ["0","0.1","0.2","0.3","0.4","0.5","0.6","0.7","0.8","0.9","1.0"],
+            minorTicks: 5,
+            strokeTicks: true,
+            highlights: [
+                {
+                    "from": 0.5,
+                    "to": 1,
+                    "color": "rgba(200, 50, 50, .75)"
+                }
+            ],
+            colorPlate: "#fff",
+            borderShadowWidth: 0,
+            borders: false,
+            needleType: "arrow",
+            needleWidth: 2,
+            needleCircleSize: 7,
+            needleCircleOuter: true,
+            needleCircleInner: false,
+            animationDuration: 500,
+            animationRule: "linear"
+            });
+            gauge.draw();
+            gauge.value = msg.data_choose;
+          });
+        }
+      });
         
       $('#chooseVal1').click(function(event) {
           console.log($('#chooseVal1').val());
