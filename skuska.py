@@ -19,36 +19,38 @@ def background_thread(args):
     while True:
         read_ser = ser.readline()
         read_ser = read_ser.decode()
-        if args:
-            vyber = dict(args).get('Vyber')
-            btnV = dict(args).get('btn_value')
-        else:
-            vyber = 1
-            btnV = 'null'
-        print (args) 
+        
+        btnVchoose = dict(args).get('btn_choose')
+        btnVstart = dict(args).get('btn_start')
+        print (args)
+        
         socketio.sleep(1)
         count += 1
         read_ser_data = read_ser.split(" ")
         read_ser_data[3] = read_ser_data[3].replace("\r\n","")
         print(read_ser_data)
-        if btnV == "Start":
-            socketio.emit('my_response',{'distance': float(read_ser_data[0]), 'humidity': float(read_ser_data[1]),
-                                         'temperature': float(read_ser_data[2]), 'photo': float(read_ser_data[3]), 'count': count},
-                          namespace='/test')  
+        if btnVstart == "Start":
+            if btnVchoose == "Distance":
+                socketio.emit('my_response',{'velicina': "Distance", 'data_choose': float(read_ser_data[0]), 'count': count, 'unit': " cm"}, namespace='/test')
+            if btnVchoose == "Humidity":
+                socketio.emit('my_response',{'velicina': "Humidity", 'data_choose': float(read_ser_data[1]), 'count': count, 'unit': " %"}, namespace='/test')
+            if btnVchoose == "Temperature":
+                socketio.emit('my_response',{'velicina': "Temperature", 'data_choose': float(read_ser_data[2]), 'count': count, 'unit': " °C"}, namespace='/test')
+            if btnVchoose == "Photo":
+                socketio.emit('my_response',{'velicina': "Photo", 'data_choose': float(read_ser_data[3]), 'count': count, 'unit': ""}, namespace='/test')
 
 @app.route('/', methods=['GET', 'POST'])
 def skuska():
     return render_template('skuska.html', async_mode=socketio.async_mode)
 
-@socketio.on('click_event', namespace='/test')
-def click_event(message):   
-    session['btn_value'] = message['value'] 
+@socketio.on('start_event', namespace='/test')
+def start_event(message):   
+    session['btn_start'] = message['value'] 
 
-@socketio.on('my_event', namespace='/test')
-def my_event(message):   
-    session['Vyber'] = message['value']  
-    #emit('my_response', {'Distance': session['Distance'], 'Humidity': session['Humidity'], 'Temperature': session['Temperature'], 'Photo': session['Photo']})
- 
+@socketio.on('choose_event', namespace='/test')
+def choose_event(message):   
+    session['btn_choose'] = message['value']
+    
 @socketio.on('close', namespace='/test')
 def close():
     emit('my_response', {'data': 'Closed'})
